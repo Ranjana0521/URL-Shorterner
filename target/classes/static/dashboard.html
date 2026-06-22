@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortLink Pro - Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Style Sheet -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Dashboard Main Layout -->
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Navigation -->
+        <div class="sidebar-premium">
+            <div class="sidebar-brand">
+                <i class="fas fa-link me-2"></i>ShortLink Pro
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="sidebar-link active" data-view="overview-view">
+                        <i class="fas fa-chart-pie"></i>Overview
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-view="links-view">
+                        <i class="fas fa-list-ul"></i>Link Manager
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-view="analytics-view">
+                        <i class="fas fa-chart-bar"></i>Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-view="developer-view">
+                        <i class="fas fa-code"></i>Developer API
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-view="settings-view">
+                        <i class="fas fa-cog"></i>Settings
+                    </a>
+                </li>
+            </ul>
+            <div class="mt-auto">
+                <hr class="my-3 border-slate">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="theme-toggle me-3" id="theme-toggle-btn">
+                        <i class="fas fa-moon"></i>
+                    </span>
+                    <span class="small text-secondary font-weight-medium" id="user-display-name">Loading User...</span>
+                </div>
+                <a href="#" class="sidebar-link text-danger" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>Sign Out
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="dashboard-main">
+            <!-- View Loader Overlay -->
+            <div id="view-loader" class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(var(--bg-primary), 0.7); z-index: 999; display: none !important;">
+                <div class="premium-spinner"></div>
+            </div>
+
+            <!-- VIEW 1: Overview -->
+            <div id="overview-view" class="dashboard-view-panel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>Dashboard Overview</h2>
+                        <p class="text-secondary m-0">Quick summary of your ShortLink analytics performance.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-premium-outline" data-bs-toggle="modal" data-bs-target="#bulkUrlModal">
+                            <i class="fas fa-boxes me-2"></i>Bulk Shorten
+                        </button>
+                        <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#createUrlModal">
+                            <i class="fas fa-plus me-2"></i>Create Short Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Counters Grid -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-primary"><i class="fas fa-link"></i></div>
+                            <span class="text-secondary small fw-semibold">Total Short Links</span>
+                            <h3 class="m-0 mt-1" id="stat-total-links">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-success"><i class="fas fa-mouse-pointer"></i></div>
+                            <span class="text-secondary small fw-semibold">Total Click Counts</span>
+                            <h3 class="m-0 mt-1" id="stat-total-clicks">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-warning"><i class="fas fa-check-circle"></i></div>
+                            <span class="text-secondary small fw-semibold">Active Campaigns</span>
+                            <h3 class="m-0 mt-1" id="stat-active-links">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-danger"><i class="fas fa-times-circle"></i></div>
+                            <span class="text-secondary small fw-semibold">Expired Campaigns</span>
+                            <h3 class="m-0 mt-1" id="stat-expired-links">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Recent Activity Panel -->
+                    <div class="col-lg-7">
+                        <div class="glass-panel p-4 h-100">
+                            <h4 class="mb-3">Recent Click Records</h4>
+                            <div class="table-responsive" style="max-height: 380px;">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr class="text-secondary small">
+                                            <th>Short Code</th>
+                                            <th>Country</th>
+                                            <th>Device</th>
+                                            <th>Browser</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-activity-tbody">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">No recent click activities logged.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions & Health -->
+                    <div class="col-lg-5">
+                        <div class="glass-panel p-4 h-100">
+                            <h4 class="mb-4">Link Health Monitors</h4>
+                            <div id="health-monitor-list" class="d-flex flex-column gap-3">
+                                <p class="text-muted small text-center my-4">No monitored links. Create a link to view health status.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: Link Manager -->
+            <div id="links-view" class="dashboard-view-panel" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>Link Manager</h2>
+                        <p class="text-secondary m-0">Search, filter, edit, and organize all shortened URLs.</p>
+                    </div>
+                    <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#createUrlModal">
+                        <i class="fas fa-plus me-2"></i>Create Link
+                    </button>
+                </div>
+
+                <!-- Filters Panel -->
+                <div class="glass-panel p-3 mb-4">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0 text-muted" style="border-color: var(--border-color);"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-links-input" class="form-control bg-transparent border-start-0 text-primary" placeholder="Search original url, code, or alias..." style="border-color: var(--border-color); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="sort-links-select" class="form-select bg-transparent text-secondary" style="border-color: var(--border-color);">
+                                <option value="createdAt" selected>Created Date</option>
+                                <option value="clicks">Click Count</option>
+                                <option value="shortCode">Short Code</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="search-filter-btn" class="btn btn-premium-outline w-100">
+                                <i class="fas fa-filter me-1"></i>Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Links Table -->
+                <div class="glass-panel p-4">
+                    <div class="table-responsive">
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th>Link Metadata</th>
+                                    <th>Clicks</th>
+                                    <th>Expiry & Locks</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="links-table-tbody">
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">Loading links database...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="d-flex justify-content-between align-items-center mt-4" id="pagination-container">
+                        <button class="btn btn-premium-outline btn-sm" id="prev-page-btn" disabled>Previous</button>
+                        <span class="small text-secondary" id="page-indicator">Page 1 of 1</span>
+                        <button class="btn btn-premium-outline btn-sm" id="next-page-btn" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: Analytics Dashboard -->
+            <div id="analytics-view" class="dashboard-view-panel" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>Analytics Dashboard</h2>
+                        <p class="text-secondary m-0">Detailed breakdown of referring domains, platforms, and locations.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-premium-outline" id="refresh-analytics-btn">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                        <button class="btn btn-premium" id="export-analytics-btn">
+                            <i class="fas fa-file-csv me-1"></i>Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Graphs grids -->
+                <div class="row g-4 mb-4">
+                    <!-- Daily Click Line Chart -->
+                    <div class="col-lg-8">
+                        <div class="glass-panel p-4 h-100">
+                            <h5 class="mb-3">Redirection Click Trends (Daily)</h5>
+                            <div style="position: relative; height: 320px;">
+                                <canvas id="dailyClicksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Devices Pie Chart -->
+                    <div class="col-lg-4">
+                        <div class="glass-panel p-4 h-100">
+                            <h5 class="mb-3">Devices Breakdown</h5>
+                            <div style="position: relative; height: 320px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="deviceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Browsers breakdown -->
+                    <div class="col-lg-4">
+                        <div class="glass-panel p-4 h-100">
+                            <h5 class="mb-3">Browsers Breakdown</h5>
+                            <div style="position: relative; height: 260px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="browserChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Referring Domains table -->
+                    <div class="col-lg-4">
+                        <div class="glass-panel p-4 h-100">
+                            <h5 class="mb-3">Top Referring Domains</h5>
+                            <div class="table-responsive" style="max-height: 260px;">
+                                <table class="table table-sm align-middle text-muted">
+                                    <thead>
+                                        <tr class="small text-secondary">
+                                            <th>Referrer</th>
+                                            <th class="text-end">Clicks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="referrers-analytics-tbody">
+                                        <tr>
+                                            <td colspan="2" class="text-center py-4">No records logged.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Geographic Stats table -->
+                    <div class="col-lg-4">
+                        <div class="glass-panel p-4 h-100">
+                            <h5 class="mb-3">Geographic Analytics</h5>
+                            <div class="table-responsive" style="max-height: 260px;">
+                                <table class="table table-sm align-middle text-muted">
+                                    <thead>
+                                        <tr class="small text-secondary">
+                                            <th>Country</th>
+                                            <th class="text-end">Clicks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="geo-analytics-tbody">
+                                        <tr>
+                                            <td colspan="2" class="text-center py-4">No records logged.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-panel p-4">
+                            <h5 class="mb-3">Top Performing Links</h5>
+                            <div class="table-responsive">
+                                <table class="table align-middle table-hover">
+                                    <thead>
+                                        <tr class="small text-secondary">
+                                            <th>Short Code</th>
+                                            <th>Original Destination URL</th>
+                                            <th class="text-end">Clicks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="top-links-tbody">
+                                        <tr>
+                                            <td colspan="3" class="text-center py-3 text-muted">No shortened links performance recorded.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: Developer APIs -->
+            <div id="developer-view" class="dashboard-view-panel" style="display: none;">
+                <div class="mb-4">
+                    <h2>Developer Center</h2>
+                    <p class="text-secondary m-0">Access REST API capabilities using custom HTTP authorization keys.</p>
+                </div>
+
+                <!-- API Key generation box -->
+                <div class="glass-panel p-4 mb-4">
+                    <h4 class="mb-2">Your Developer API Key</h4>
+                    <p class="text-secondary small mb-4">Pass this token inside the header key `X-API-KEY` to authorize external curl requests.</p>
+                    
+                    <div class="input-group mb-3" style="max-width: 600px;">
+                        <input type="password" id="developer-api-key-text" class="form-control bg-transparent text-primary fw-medium" readonly style="border-color: var(--border-color); color: var(--text-primary);">
+                        <button class="btn btn-premium-outline" type="button" id="toggle-reveal-key-btn">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-premium-outline" type="button" id="copy-api-key-btn">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn btn-danger" type="button" id="regenerate-api-key-btn">
+                            <i class="fas fa-sync-alt me-1"></i>Regenerate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive API Tester -->
+                <div class="glass-panel p-4">
+                    <h4 class="mb-3">Interactive Endpoint Documentation</h4>
+                    
+                    <div class="accordion accordion-flush" id="apiAccordion">
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-primary fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#apiCollapse1">
+                                    <span class="badge bg-success me-2">POST</span> /api/urls (Shorten URL)
+                                </button>
+                            </h2>
+                            <div id="apiCollapse1" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+                                <div class="accordion-body text-secondary small">
+                                    <p class="font-weight-semibold">Headers required:</p>
+                                    <pre class="bg-dark text-white p-3 rounded">X-API-KEY: your_api_key_here
+Content-Type: application/json</pre>
+                                    <p class="font-weight-semibold">Request Body:</p>
+                                    <pre class="bg-dark text-white p-3 rounded">{
+  "originalUrl": "https://example.com/long-url",
+  "customAlias": "optional_alias",
+  "expiryDate": "2026-06-30T18:00:00",
+  "clickLimit": 100,
+  "password": "optionalPassword"
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: Settings -->
+            <div id="settings-view" class="dashboard-view-panel" style="display: none;">
+                <div class="mb-4">
+                    <h2>Account Settings</h2>
+                    <p class="text-secondary m-0">Adjust your email address or update login passwords.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="glass-panel p-4">
+                            <h4 class="mb-4">Update Security Profile</h4>
+                            <form id="update-profile-form">
+                                <div class="mb-3">
+                                    <label for="settings-email" class="form-label text-secondary small fw-semibold">Email Address</label>
+                                    <input type="email" class="form-control bg-transparent text-primary" id="settings-email" required style="border-color: var(--border-color); color: var(--text-primary);">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="settings-new-password" class="form-label text-secondary small fw-semibold">New Password (leave blank to keep current)</label>
+                                    <input type="password" class="form-control bg-transparent text-primary" id="settings-new-password" placeholder="••••••••" minlength="6" style="border-color: var(--border-color); color: var(--text-primary);">
+                                </div>
+                                <button type="submit" class="btn btn-premium w-100 py-2">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 1: Create URL Modal -->
+    <div class="modal fade" id="createUrlModal" tabindex="-1" aria-labelledby="createUrlModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0 text-start" style="background: var(--bg-secondary); border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="createUrlModalLabel">Create Short URL</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-url-form">
+                        <div class="mb-3">
+                            <label for="modal-originalUrl" class="form-label text-secondary small fw-semibold">Destination URL *</label>
+                            <input type="url" class="form-control bg-transparent text-primary" id="modal-originalUrl" placeholder="https://example.com/destination" required style="border-color: var(--border-color); color: var(--text-primary);">
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal-customAlias" class="form-label text-secondary small fw-semibold">Custom Alias (Optional)</label>
+                            <input type="text" class="form-control bg-transparent text-primary" id="modal-customAlias" placeholder="promo-2026" style="border-color: var(--border-color); color: var(--text-primary);">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label for="modal-expiryDate" class="form-label text-secondary small fw-semibold">Expiry Date</label>
+                                <input type="datetime-local" class="form-control bg-transparent text-primary" id="modal-expiryDate" style="border-color: var(--border-color); color: var(--text-primary);">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="modal-clickLimit" class="form-label text-secondary small fw-semibold">Click Limits</label>
+                                <input type="number" class="form-control bg-transparent text-primary" id="modal-clickLimit" placeholder="1000" min="1" style="border-color: var(--border-color); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="modal-password" class="form-label text-secondary small fw-semibold">Password Lock</label>
+                            <input type="password" class="form-control bg-transparent text-primary" id="modal-password" placeholder="Leave blank to unlock publicly" style="border-color: var(--border-color); color: var(--text-primary);">
+                        </div>
+                        <button type="submit" class="btn btn-premium w-100 py-2.5">Generate Short Link</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Edit URL Modal -->
+    <div class="modal fade" id="editUrlModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0 text-start" style="background: var(--bg-secondary); border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Modify URL Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-url-form">
+                        <input type="hidden" id="edit-url-id">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-semibold">Destination URL (read-only)</label>
+                            <input type="text" class="form-control bg-transparent text-muted" id="edit-originalUrl" readonly style="border-color: var(--border-color);">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label for="edit-expiryDate" class="form-label text-secondary small fw-semibold">Expiry Date</label>
+                                <input type="datetime-local" class="form-control bg-transparent text-primary" id="edit-expiryDate" style="border-color: var(--border-color); color: var(--text-primary);">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="edit-clickLimit" class="form-label text-secondary small fw-semibold">Click Limits</label>
+                                <input type="number" class="form-control bg-transparent text-primary" id="edit-clickLimit" min="1" style="border-color: var(--border-color); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-password" class="form-label text-secondary small fw-semibold">Password Lock</label>
+                            <input type="password" class="form-control bg-transparent text-primary" id="edit-password" placeholder="••••••••" style="border-color: var(--border-color); color: var(--text-primary);">
+                            <div class="form-text text-muted small">Enter a new password, or leave blank to disable protection.</div>
+                        </div>
+                        <button type="submit" class="btn btn-premium w-100 py-2.5">Update Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: QR Code Display Modal -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content glass-panel border-0 text-center" style="background: var(--bg-secondary); border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold w-100">QR Code Link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="qr-modal-image" src="" alt="QR Code Image" class="img-fluid border rounded-3 p-3 bg-white mb-3">
+                    <a id="qr-modal-download-btn" href="" download="qr_code.png" class="btn btn-premium w-100">
+                        <i class="fas fa-download me-1"></i>Download PNG
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Bulk Shortener Modal -->
+    <div class="modal fade" id="bulkUrlModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content glass-panel border-0 text-start" style="background: var(--bg-secondary); border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Bulk URL Shortening</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small">Enter multiple URLs, one destination link per line. Each link will be shortened automatically.</p>
+                    <form id="bulk-shorten-form">
+                        <div class="mb-3">
+                            <textarea id="bulk-urls-textarea" class="form-control bg-transparent text-primary" rows="8" placeholder="https://google.com&#10;https://github.com&#10;https://spring.io" required style="border-color: var(--border-color); color: var(--text-primary); font-family: monospace;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-premium w-100 py-2.5">
+                            <i class="fas fa-magic me-2"></i>Shorten All Links
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <!-- Dashboard Actions JS -->
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
